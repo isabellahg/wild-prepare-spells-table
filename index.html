@@ -296,6 +296,57 @@
     .alt-pill.theme-aoe    { border-color: rgba(70,175,140,0.50); color: #084534; background: rgba(195,238,220,0.42); }
     .alt-pill.theme-utility{ border-color: rgba(130,115,90,0.40); color: rgba(60,40,22,0.70); background: rgba(60,40,22,0.06); }
 
+    /* ── Prob hover label (overlays pills on bar hover, no layout shift) ── */
+    .alts-hover-wrap {
+      position: relative;
+    }
+    .prob-hover-label {
+      display: none;
+      position: absolute;
+      inset: 0;
+      flex-wrap: wrap;
+      gap: 5px;
+      background: #ede5d0;
+      align-content: flex-start;
+    }
+
+    /* ── d100 probability bar ── */
+    .prob-bar-wrap { margin-top: 6px; }
+    .prob-bar {
+      display: flex;
+      height: 22px;
+      border-radius: var(--r-pill);
+      overflow: hidden;
+      gap: 1px;
+    }
+    .prob-seg {
+      flex-basis: 0;
+      height: 100%;
+      opacity: 0.72;
+      cursor: default;
+      transition: opacity 120ms var(--ease-out);
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      color: rgba(255,255,255,0.88);
+    }
+    .prob-seg:first-child { border-radius: var(--r-pill) 0 0 var(--r-pill); }
+    .prob-seg:last-child  { border-radius: 0 var(--r-pill) var(--r-pill) 0; }
+    .prob-bar:hover .prob-seg { opacity: 0.35; }
+    .prob-bar:hover .prob-seg:hover { opacity: 1; }
+    .prob-seg.theme-fire    { background: rgba(191,128,50,0.85); }
+    .prob-seg.theme-ice     { background: rgba(100,155,200,0.85); }
+    .prob-seg.theme-shadow  { background: rgba(150,145,195,0.85); }
+    .prob-seg.theme-mind    { background: rgba(200,130,165,0.85); }
+    .prob-seg.theme-aoe     { background: rgba(70,175,140,0.85); }
+    .prob-seg.theme-utility { background: rgba(130,115,90,0.70); }
+
     /* ── Row note ── */
     .note {
       font-family: var(--font-serif);
@@ -610,6 +661,20 @@
     .replacement-pill.theme-aoe    { border-color: rgba(70,175,140,0.50);  color: #084534; background: rgba(195,238,220,0.52); }
     .replacement-pill.theme-utility{ border-color: rgba(130,115,90,0.45);  color: rgba(60,40,22,0.75); background: rgba(60,40,22,0.09); }
 
+    /* ── d100 roll badge ── */
+    .roll-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: var(--r-pill);
+      background: rgba(60,40,22,0.07);
+      border: 0.5px solid rgba(60,40,22,0.20);
+      color: rgba(60,40,22,0.55);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
     /* Per-row reset button */
     .btn-reset-spell {
       font-family: var(--font-serif);
@@ -806,7 +871,44 @@
       span.appendChild(highlight(name, query));
       wrap.appendChild(span);
     }
-    td.appendChild(wrap);
+    const hoverLabel = document.createElement('div');
+    hoverLabel.className = 'prob-hover-label';
+    const pillsWrap = document.createElement('div');
+    pillsWrap.className = 'alts-hover-wrap';
+    pillsWrap.appendChild(wrap);
+    pillsWrap.appendChild(hoverLabel);
+    td.appendChild(pillsWrap);
+    if (alts.length > 0) {
+      const barWrap = document.createElement('div');
+      barWrap.className = 'prob-bar-wrap';
+      const bar = document.createElement('div');
+      bar.className = 'prob-bar';
+      const bands = computeBands(alts.length);
+      for (let i = 0; i < alts.length; i++) {
+        const [theme] = alts[i].split(':');
+        const name = alts[i].split(':').slice(1).join(':');
+        if (!name) continue;
+        const { lo, hi } = bands[i];
+        const seg = document.createElement('div');
+        seg.className = 'prob-seg theme-' + theme;
+        seg.style.flexGrow = String(hi - lo + 1);
+        seg.textContent = name;
+        seg.addEventListener('mouseenter', () => {
+          hoverLabel.innerHTML = '';
+          const pill = document.createElement('span');
+          pill.className = 'alt-pill theme-' + theme;
+          pill.textContent = name + ' · ' + lo + '–' + hi;
+          hoverLabel.appendChild(pill);
+          hoverLabel.style.display = 'flex';
+        });
+        bar.appendChild(seg);
+      }
+      bar.addEventListener('mouseleave', () => {
+        hoverLabel.style.display = 'none';
+      });
+      barWrap.appendChild(bar);
+      td.appendChild(barWrap);
+    }
     if (note) {
       const p = document.createElement('div');
       p.className = 'note';
@@ -821,11 +923,39 @@
   let selectedSpells = new Set();  // spell names currently checked
   let unstableMap   = new Map();   // spell name → { replacement, theme }
 
+  function computeWeights(N) {
+    const WORST = 10, BEST = 11, MIDDLE = 79;
+    if (N === 1) return [100];
+    if (N === 2) return [WORST, WORST + MIDDLE + BEST];
+    const mc = N - 2;
+    const denom = mc * (mc + 1) / 2;
+    const midWidths = [];
+    for (let i = 1; i < N - 1; i++) {
+      midWidths.push(Math.floor(((N - 1 - i) / denom) * MIDDLE));
+    }
+    const midSum = midWidths.reduce((a, b) => a + b, 0);
+    midWidths[0] += MIDDLE - midSum;
+    return [WORST, ...midWidths, BEST];
+  }
+
+  function computeBands(N) {
+    const weights = computeWeights(N);
+    const bands = []; let cum = 0;
+    for (const w of weights) {
+      bands.push({ lo: cum + 1, hi: cum + w });
+      cum += w;
+    }
+    return bands;
+  }
+
   function pickReplacement(alts) {
     if (!alts.length) return null;
-    const alt = alts[Math.floor(Math.random() * alts.length)];
+    const roll = Math.floor(Math.random() * 100) + 1;
+    const bands = computeBands(alts.length);
+    const idx = bands.findIndex(b => roll >= b.lo && roll <= b.hi);
+    const alt = alts[idx >= 0 ? idx : 0];
     const [theme, ...rest] = alt.split(':');
-    return { replacement: rest.join(':'), theme };
+    return { replacement: rest.join(':'), theme, roll };
   }
 
   function buildSpellCell(spell, query) {
@@ -881,6 +1011,14 @@
       pill.className = 'replacement-pill theme-' + info.theme;
       pill.textContent = info.replacement;
       slot.appendChild(pill);
+
+      if (info.roll != null) {
+        const badge = document.createElement('span');
+        badge.className = 'roll-badge';
+        badge.textContent = 'd' + info.roll;
+        badge.title = 'Rolled ' + info.roll + ' on d100';
+        slot.appendChild(badge);
+      }
 
       const resetBtn = document.createElement('button');
       resetBtn.className = 'btn-reset-spell';
@@ -1005,6 +1143,7 @@
       const entries = JSON.parse(raw);
       for (const [name, info] of entries) {
         if (allSpells.some(s => s.spell === name)) {
+          if (typeof info.roll === 'undefined') info.roll = null;
           unstableMap.set(name, info);
         }
       }
