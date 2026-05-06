@@ -574,9 +574,62 @@
 
     .btn-make-unstable:active:not(:disabled) { transform: scale(0.985); }
 
+    .btn-make-unstable.is-casting {
+      animation: chaos-shake 600ms var(--ease-out);
+    }
+
     .btn-make-unstable:disabled {
       opacity: 0.38;
       cursor: default;
+    }
+
+    .btn-subset-unstable {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(120, 80, 180, 0.5);
+      background: rgba(150, 100, 220, 0.12);
+      color: #3d1a6e;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background 150ms var(--ease-out);
+    }
+
+    .btn-subset-unstable:hover {
+      background: rgba(150, 100, 220, 0.22);
+    }
+
+    .btn-subset-unstable:active { transform: scale(0.985); }
+
+    .btn-subset-unstable.is-casting {
+      animation: chaos-shake 600ms var(--ease-out);
+    }
+
+    .btn-really-unstable {
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(160, 50, 10, 0.6);
+      background: rgba(210, 80, 20, 0.13);
+      color: #7a1a00;
+      cursor: pointer;
+      transition: background 150ms var(--ease-out);
+    }
+
+    .btn-really-unstable:hover {
+      background: rgba(210, 80, 20, 0.24);
+    }
+
+    .btn-really-unstable:active { transform: scale(0.985); }
+
+    .btn-really-unstable.is-casting {
+      animation: chaos-shake 600ms var(--ease-out);
     }
 
     .btn-reset-all {
@@ -620,11 +673,15 @@
 
     /* Row tint when unstable */
     .row--unstable td { background: rgba(216, 180, 106, 0.09); }
+    .row--flash td { animation: unstable-flash 1400ms var(--ease-out) calc(var(--stagger-i, 0) * 100ms) both; }
 
     /* Original spell name when overridden */
     .spell-name.is-unstable {
       text-decoration: line-through;
       opacity: 0.42;
+    }
+    .row--flash .spell-name.is-unstable {
+      animation: name-fade 500ms var(--ease-out) calc(var(--stagger-i, 0) * 100ms) both;
     }
 
     /* Replacement display */
@@ -633,6 +690,9 @@
       align-items: center;
       gap: 6px;
       margin-top: 6px;
+    }
+    .row--flash .unstable-slot {
+      animation: slot-in 520ms var(--ease-settle) calc(var(--stagger-i, 0) * 100ms + 120ms) both;
     }
 
     .unstable-arrow {
@@ -689,6 +749,32 @@
     }
 
     .btn-reset-spell:hover { color: rgba(60, 40, 22, 0.75); }
+
+    @keyframes chaos-shake {
+      0%   { transform: none; }
+      15%  { transform: translateX(-4px) rotate(-1.5deg); }
+      30%  { transform: translateX(4px)  rotate( 1.5deg); }
+      45%  { transform: translateX(-3px) rotate(-1deg); }
+      60%  { transform: translateX( 3px) rotate( 0.8deg); }
+      75%  { transform: translateX(-2px) rotate(-0.4deg); }
+      90%  { transform: translateX( 1px) rotate( 0.2deg); }
+      100% { transform: none; }
+    }
+
+    @keyframes unstable-flash {
+      0%   { background: rgba(216, 180, 106, 0.55); }
+      100% { background: rgba(216, 180, 106, 0.09); }
+    }
+
+    @keyframes slot-in {
+      from { opacity: 0; transform: translateY(-7px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes name-fade {
+      from { opacity: 1; }
+      to   { opacity: 0.42; }
+    }
   </style>
 </head>
 <body>
@@ -773,6 +859,8 @@
 
       <div class="unstable-bar">
         <button class="btn-make-unstable" id="makeUnstableBtn" disabled>⚡ Make unstable</button>
+        <button class="btn-subset-unstable" id="subsetUnstableBtn">🎲 Random subset</button>
+        <button class="btn-really-unstable" id="reallyUnstableBtn">🌀 MAKE EVERYTHING UNSTABLE</button>
         <button class="btn-reset-all" id="resetAllBtn" style="display:none">Reset all</button>
       </div>
     </div>
@@ -922,6 +1010,7 @@
   let allSpells = [];
   let selectedSpells = new Set();  // spell names currently checked
   let unstableMap   = new Map();   // spell name → { replacement, theme }
+  let newlyUnstable = new Set();   // cleared after each render cycle
 
   function computeWeights(N) {
     const WORST = 10, BEST = 11, MIDDLE = 79;
@@ -1009,13 +1098,27 @@
 
       const pill = document.createElement('span');
       pill.className = 'replacement-pill theme-' + info.theme;
-      pill.textContent = info.replacement;
+      const isNewSpell = newlyUnstable.has(spell.spell);
+      if (isNewSpell) {
+        pill.dataset.animateSpell = info.replacement;
+        pill.textContent = allSpells.length
+          ? allSpells[Math.floor(Math.random() * allSpells.length)].spell
+          : '???';
+      } else {
+        pill.textContent = info.replacement;
+      }
       slot.appendChild(pill);
 
       if (info.roll != null) {
         const badge = document.createElement('span');
         badge.className = 'roll-badge';
-        badge.textContent = 'd' + info.roll;
+        const isNew = newlyUnstable.has(spell.spell);
+        if (isNew) {
+          badge.textContent = 'd??';
+          badge.dataset.animateRoll = info.roll;
+        } else {
+          badge.textContent = 'd' + info.roll;
+        }
         badge.title = 'Rolled ' + info.roll + ' on d100';
         slot.appendChild(badge);
       }
@@ -1059,10 +1162,15 @@
       table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
+      let staggerIdx = 0;
       for (const spell of rows) {
         const searchText = [spell.spell, ...spell.alts.map(a => a.split(':').slice(1).join(':'))].join(' ').toLowerCase();
         const tr = document.createElement('tr');
         if (unstableMap.has(spell.spell)) tr.classList.add('row--unstable');
+        if (newlyUnstable.has(spell.spell)) {
+          tr.classList.add('row--flash');
+          tr.style.setProperty('--stagger-i', staggerIdx++);
+        }
         tr.dataset.search = searchText;
         tr.appendChild(buildSpellCell(spell, query));
         tr.appendChild(buildAltsCell(spell.alts, spell.note, query));
@@ -1166,17 +1274,122 @@
       unstableMap.size > 0 ? '' : 'none';
   }
 
-  function makeUnstable() {
-    for (const name of selectedSpells) {
-      const spell = allSpells.find(s => s.spell === name);
-      if (!spell || !spell.alts.length) continue;
-      unstableMap.set(name, pickReplacement(spell.alts));
+  function animateUnstableSlot(badge, pill, finalRoll, finalSpell, startDelay) {
+    setTimeout(() => {
+      let frame = 0;
+      const FRAMES = 22;
+      const tick = () => {
+        if (frame < FRAMES) {
+          badge.textContent = 'd' + (Math.floor(Math.random() * 100) + 1);
+          if (allSpells.length) {
+            pill.textContent = allSpells[Math.floor(Math.random() * allSpells.length)].spell;
+          }
+          frame++;
+          setTimeout(tick, 30 + (frame / FRAMES) * 130);
+        } else {
+          badge.textContent = 'd' + finalRoll;
+          pill.textContent = finalSpell;
+        }
+      };
+      tick();
+    }, startDelay);
+  }
+
+  function makeSubsetUnstable() {
+    const eligible = allSpells.filter(s => s.alts.length > 0);
+    if (!eligible.length) return;
+
+    const count = Math.floor(Math.random() * eligible.length) + 1;
+    const pool = [...eligible];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
     }
+
+    newlyUnstable.clear();
+    for (const spell of pool.slice(0, count)) {
+      newlyUnstable.add(spell.spell);
+      unstableMap.set(spell.spell, pickReplacement(spell.alts));
+    }
+
+    const btn = document.getElementById('subsetUnstableBtn');
+    btn.classList.add('is-casting');
+    btn.addEventListener('animationend', () => btn.classList.remove('is-casting'), { once: true });
+
     selectedSpells.clear();
     saveUnstableState();
     applyFilters();
     updateUnstableBtn();
     updateResetAllBtn();
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.roll-badge[data-animate-roll]').forEach((badge, i) => {
+        const finalRoll = parseInt(badge.dataset.animateRoll, 10);
+        const pill = badge.closest('.unstable-slot').querySelector('.replacement-pill');
+        const finalSpell = pill.dataset.animateSpell;
+        animateUnstableSlot(badge, pill, finalRoll, finalSpell, i * 200);
+      });
+      newlyUnstable.clear();
+    });
+  }
+
+  function makeReallyUnstable() {
+    newlyUnstable.clear();
+    for (const spell of allSpells) {
+      if (!spell.alts.length) continue;
+      newlyUnstable.add(spell.spell);
+      unstableMap.set(spell.spell, pickReplacement(spell.alts));
+    }
+
+    const btn = document.getElementById('reallyUnstableBtn');
+    btn.classList.add('is-casting');
+    btn.addEventListener('animationend', () => btn.classList.remove('is-casting'), { once: true });
+
+    selectedSpells.clear();
+    saveUnstableState();
+    applyFilters();
+    updateUnstableBtn();
+    updateResetAllBtn();
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.roll-badge[data-animate-roll]').forEach((badge, i) => {
+        const finalRoll = parseInt(badge.dataset.animateRoll, 10);
+        const pill = badge.closest('.unstable-slot').querySelector('.replacement-pill');
+        const finalSpell = pill.dataset.animateSpell;
+        animateUnstableSlot(badge, pill, finalRoll, finalSpell, i * 200);
+      });
+      newlyUnstable.clear();
+    });
+  }
+
+  function makeUnstable() {
+    newlyUnstable.clear();
+    for (const name of selectedSpells) {
+      const spell = allSpells.find(s => s.spell === name);
+      if (!spell || !spell.alts.length) continue;
+      newlyUnstable.add(name);
+      unstableMap.set(name, pickReplacement(spell.alts));
+    }
+
+    const btn = document.getElementById('makeUnstableBtn');
+    btn.classList.add('is-casting');
+    btn.addEventListener('animationend', () => btn.classList.remove('is-casting'), { once: true });
+
+    selectedSpells.clear();
+    saveUnstableState();
+    applyFilters();
+    updateUnstableBtn();
+    updateResetAllBtn();
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.roll-badge[data-animate-roll]').forEach((badge, i) => {
+        const finalRoll = parseInt(badge.dataset.animateRoll, 10);
+        const pill = badge.closest('.unstable-slot').querySelector('.replacement-pill');
+        const finalSpell = pill.dataset.animateSpell;
+        animateUnstableSlot(badge, pill, finalRoll, finalSpell, i * 200);
+      });
+      newlyUnstable.clear();
+    });
   }
 
   function resetSpell(name) {
@@ -1190,6 +1403,8 @@
 
   function bindUnstableControls() {
     document.getElementById('makeUnstableBtn').addEventListener('click', makeUnstable);
+    document.getElementById('subsetUnstableBtn').addEventListener('click', makeSubsetUnstable);
+    document.getElementById('reallyUnstableBtn').addEventListener('click', makeReallyUnstable);
     document.getElementById('resetAllBtn').addEventListener('click', () => {
       unstableMap.clear();
       selectedSpells.clear();
