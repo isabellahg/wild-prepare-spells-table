@@ -494,6 +494,136 @@
     }
 
     .dm-note a:hover { color: rgba(60, 40, 22, 0.85); text-decoration-style: solid; }
+
+    /* ── Unstable feature ── */
+    .unstable-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-make-unstable {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(191, 128, 50, 0.65);
+      background: rgba(250, 214, 160, 0.5);
+      color: #5a3600;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background 150ms var(--ease-out), opacity 150ms;
+    }
+
+    .btn-make-unstable:hover:not(:disabled) {
+      background: rgba(250, 214, 160, 0.75);
+    }
+
+    .btn-make-unstable:active:not(:disabled) { transform: scale(0.985); }
+
+    .btn-make-unstable:disabled {
+      opacity: 0.38;
+      cursor: default;
+    }
+
+    .btn-reset-all {
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      padding: 5px 12px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(60, 40, 22, 0.2);
+      background: transparent;
+      color: rgba(60, 40, 22, 0.55);
+      cursor: pointer;
+      transition: color 150ms, border-color 150ms;
+    }
+
+    .btn-reset-all:hover {
+      color: rgba(60, 40, 22, 0.85);
+      border-color: rgba(60, 40, 22, 0.4);
+    }
+
+    /* Checkbox column */
+    th.col-check { width: 3%; }
+
+    /* Spell name row wrapper (checkbox + name) */
+    .spell-name-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    /* Parchment-style checkbox */
+    .spell-select {
+      margin-top: 3px;
+      flex-shrink: 0;
+      width: 13px;
+      height: 13px;
+      accent-color: #bf8032;
+      cursor: pointer;
+    }
+
+    .spell-select:disabled { opacity: 0.3; cursor: default; }
+
+    /* Row tint when unstable */
+    .row--unstable td { background: rgba(216, 180, 106, 0.09); }
+
+    /* Original spell name when overridden */
+    .spell-name.is-unstable {
+      text-decoration: line-through;
+      opacity: 0.42;
+    }
+
+    /* Replacement display */
+    .unstable-slot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .unstable-arrow {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: rgba(175, 130, 30, 0.65);
+      flex-shrink: 0;
+    }
+
+    .replacement-pill {
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(191, 128, 50, 0.6);
+      background: rgba(250, 214, 160, 0.5);
+      color: #5a3600;
+      white-space: nowrap;
+    }
+
+    /* Theme overrides for replacement pill (inherits theme color context) */
+    .replacement-pill.theme-ice    { border-color: rgba(100,155,200,0.55); color: #0e3a62; background: rgba(200,225,248,0.50); }
+    .replacement-pill.theme-shadow { border-color: rgba(150,145,195,0.50); color: #38307a; background: rgba(210,208,245,0.48); }
+    .replacement-pill.theme-mind   { border-color: rgba(200,130,165,0.50); color: #6a1f3a; background: rgba(245,210,225,0.50); }
+    .replacement-pill.theme-aoe    { border-color: rgba(70,175,140,0.50);  color: #084534; background: rgba(195,238,220,0.52); }
+    .replacement-pill.theme-utility{ border-color: rgba(130,115,90,0.45);  color: rgba(60,40,22,0.75); background: rgba(60,40,22,0.09); }
+
+    /* Per-row reset button */
+    .btn-reset-spell {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      line-height: 1;
+      padding: 0 4px;
+      border: none;
+      background: none;
+      color: rgba(60, 40, 22, 0.35);
+      cursor: pointer;
+      transition: color 120ms;
+    }
+
+    .btn-reset-spell:hover { color: rgba(60, 40, 22, 0.75); }
   </style>
 </head>
 <body>
@@ -575,6 +705,11 @@
       <p class="dm-note">
         DM edits: <a href="https://docs.google.com/spreadsheets/d/10utMfP_t3T11Hq3x0ftySwmi1loywdVH-_nVUEkz2_s/edit?gid=1541159395#gid=1541159395" target="_blank" rel="noopener">spell list spreadsheet ↗</a>
       </p>
+
+      <div class="unstable-bar">
+        <button class="btn-make-unstable" id="makeUnstableBtn" disabled>⚡ Make unstable</button>
+        <button class="btn-reset-all" id="resetAllBtn" style="display:none">Reset all</button>
+      </div>
     </div>
 
     <div id="tables-root"></div>
@@ -683,6 +818,82 @@
 
   // spells data kept in module scope so re-renders can highlight
   let allSpells = [];
+  let selectedSpells = new Set();  // spell names currently checked
+  let unstableMap   = new Map();   // spell name → { replacement, theme }
+
+  function pickReplacement(alts) {
+    if (!alts.length) return null;
+    const alt = alts[Math.floor(Math.random() * alts.length)];
+    const [theme, ...rest] = alt.split(':');
+    return { replacement: rest.join(':'), theme };
+  }
+
+  function buildSpellCell(spell, query) {
+    const td = document.createElement('td');
+    const isUnstable = unstableMap.has(spell.spell);
+    const info = isUnstable ? unstableMap.get(spell.spell) : null;
+    const hasAlts = spell.alts.length > 0;
+
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'spell-select';
+    checkbox.checked = selectedSpells.has(spell.spell);
+    checkbox.disabled = !hasAlts && !isUnstable;
+    checkbox.setAttribute('aria-label', 'Select ' + spell.spell);
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) selectedSpells.add(spell.spell);
+      else selectedSpells.delete(spell.spell);
+      updateUnstableBtn();
+    });
+
+    // Name row
+    const nameRow = document.createElement('div');
+    nameRow.className = 'spell-name-row';
+    nameRow.appendChild(checkbox);
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'spell-name' + (isUnstable ? ' is-unstable' : '');
+    nameDiv.appendChild(highlight(spell.spell, query));
+    for (const key of spell.badges) {
+      const cfg = BADGES[key];
+      if (!cfg) continue;
+      const span = document.createElement('span');
+      span.className = 'spell-badge ' + cfg.cls;
+      if (cfg.style) span.setAttribute('style', cfg.style);
+      span.textContent = cfg.label;
+      nameDiv.appendChild(span);
+    }
+    nameRow.appendChild(nameDiv);
+    td.appendChild(nameRow);
+
+    // Replacement slot
+    if (isUnstable && info) {
+      const slot = document.createElement('div');
+      slot.className = 'unstable-slot';
+
+      const arrow = document.createElement('span');
+      arrow.className = 'unstable-arrow';
+      arrow.textContent = '↝';
+      slot.appendChild(arrow);
+
+      const pill = document.createElement('span');
+      pill.className = 'replacement-pill theme-' + info.theme;
+      pill.textContent = info.replacement;
+      slot.appendChild(pill);
+
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'btn-reset-spell';
+      resetBtn.textContent = '×';
+      resetBtn.setAttribute('aria-label', 'Reset ' + spell.spell);
+      resetBtn.addEventListener('click', () => resetSpell(spell.spell));
+      slot.appendChild(resetBtn);
+
+      td.appendChild(slot);
+    }
+
+    return td;
+  }
 
   function renderSections(spells, query = '') {
     const groups = new Map();
@@ -713,10 +924,9 @@
       for (const spell of rows) {
         const searchText = [spell.spell, ...spell.alts.map(a => a.split(':').slice(1).join(':'))].join(' ').toLowerCase();
         const tr = document.createElement('tr');
+        if (unstableMap.has(spell.spell)) tr.classList.add('row--unstable');
         tr.dataset.search = searchText;
-        const tdName = document.createElement('td');
-        tdName.appendChild(buildNameCell(spell.spell, spell.badges, query));
-        tr.appendChild(tdName);
+        tr.appendChild(buildSpellCell(spell, query));
         tr.appendChild(buildAltsCell(spell.alts, spell.note, query));
         tbody.appendChild(tr);
       }
@@ -779,6 +989,53 @@
     document.getElementById('searchInput').addEventListener('input', applyFilters);
   }
 
+  // ── Unstable controls ────────────────────────────────────────────────────────
+  function updateUnstableBtn() {
+    const btn = document.getElementById('makeUnstableBtn');
+    const count = [...selectedSpells].filter(name => {
+      const s = allSpells.find(x => x.spell === name);
+      return s && s.alts.length > 0;
+    }).length;
+    btn.disabled = count === 0;
+    btn.textContent = count > 0 ? `⚡ Make unstable (${count})` : '⚡ Make unstable';
+  }
+
+  function updateResetAllBtn() {
+    document.getElementById('resetAllBtn').style.display =
+      unstableMap.size > 0 ? '' : 'none';
+  }
+
+  function makeUnstable() {
+    for (const name of selectedSpells) {
+      const spell = allSpells.find(s => s.spell === name);
+      if (!spell || !spell.alts.length) continue;
+      unstableMap.set(name, pickReplacement(spell.alts));
+    }
+    selectedSpells.clear();
+    applyFilters();
+    updateUnstableBtn();
+    updateResetAllBtn();
+  }
+
+  function resetSpell(name) {
+    unstableMap.delete(name);
+    selectedSpells.delete(name);
+    applyFilters();
+    updateUnstableBtn();
+    updateResetAllBtn();
+  }
+
+  function bindUnstableControls() {
+    document.getElementById('makeUnstableBtn').addEventListener('click', makeUnstable);
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+      unstableMap.clear();
+      selectedSpells.clear();
+      applyFilters();
+      updateUnstableBtn();
+      updateResetAllBtn();
+    });
+  }
+
   // ── Load ─────────────────────────────────────────────────────────────────────
   document.getElementById('tables-root').innerHTML =
     '<div class="loader"><div class="loader-ring"></div>Loading spells…</div>';
@@ -800,6 +1057,7 @@
       allSpells = spells;
       renderSections(spells);
       bindFilter();
+      bindUnstableControls();
     })
     .catch(() => {
       document.getElementById('tables-root').innerHTML =
