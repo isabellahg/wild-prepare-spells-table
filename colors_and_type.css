@@ -1,0 +1,423 @@
+/* ============================================================
+   Marginalia — Design Tokens
+   colors_and_type.css
+
+   Import this once at the root of any design file. All other
+   styles in this design system reference these custom properties.
+
+   Theme is dark-default. Light theme via [data-theme="day"].
+   ============================================================ */
+
+/* -------- Web fonts (Google Fonts) ----------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ============================================================
+   COLOR — cool moss & moonlight on deep ink
+   ============================================================ */
+:root {
+  /* Core neutrals — ink to vellum */
+  --ink-0: #0b100e;        /* deepest, behind everything */
+  --ink-1: #111714;        /* page background, dark default */
+  --ink-2: #181f1b;        /* surface-1, cards & sheets */
+  --ink-3: #232b26;        /* surface-2, elevated cards / hover */
+  --ink-4: #2e3832;        /* surface-3, popovers, inputs */
+  --ink-5: #3d4a42;        /* dividers, subtle borders */
+
+  --vellum-1: #e9e1cf;     /* primary text on dark — warm off-white */
+  --vellum-2: #d2c8b1;     /* secondary text */
+  --vellum-3: #a89f88;     /* tertiary / metadata */
+  --vellum-4: #786f5c;     /* placeholder, disabled */
+
+  /* Moss — the structural accent */
+  --moss-1: #6b8a73;       /* primary moss */
+  --moss-2: #87a78f;       /* moss highlight */
+  --moss-3: #4a6450;       /* moss deep — borders, rules */
+  --moss-4: #2c3a30;       /* moss whisper — selection, focus rings on dark */
+
+  /* Moonlight — cooler counterpart for hyperlinks & focus */
+  --moon-1: #b9c7c2;
+  --moon-2: #8aa39c;
+
+  /* Accents — used rarely */
+  --wax-1: #d8b46a;        /* candle / primary action */
+  --wax-2: #b8923f;        /* candle pressed */
+  --wax-3: #5a4520;        /* candle deep / outlines on light */
+
+  --lichen: #c4d2a4;       /* highlight, never structural */
+  --rust:   #b56a4a;       /* warning, "tear out", also focused destructive */
+  --rust-deep: #6e3d27;
+
+  /* Semantic — dark default */
+  --bg:           var(--ink-1);
+  --bg-deep:      var(--ink-0);
+  --surface-1:    var(--ink-2);
+  --surface-2:    var(--ink-3);
+  --surface-3:    var(--ink-4);
+
+  --fg-1:         var(--vellum-1);
+  --fg-2:         var(--vellum-2);
+  --fg-3:         var(--vellum-3);
+  --fg-4:         var(--vellum-4);
+
+  --line:         var(--ink-5);
+  --line-strong:  var(--moss-3);
+
+  --accent:       var(--wax-1);
+  --accent-press: var(--wax-2);
+  --accent-fg:    var(--ink-0);   /* text on candle accent */
+
+  --link:         var(--moon-1);
+  --link-hover:   var(--vellum-1);
+
+  --focus-ring:   color-mix(in oklab, var(--wax-1) 60%, transparent);
+  --selection:    var(--moss-4);
+
+  --danger:       var(--rust);
+  --danger-deep:  var(--rust-deep);
+
+  /* Candlelight — used as background gradient, never on chrome */
+  --candle-glow:  radial-gradient(
+                    ellipse 80% 60% at 50% 0%,
+                    color-mix(in oklab, var(--wax-1) 12%, transparent) 0%,
+                    transparent 70%
+                  );
+
+  /* Paper grain — apply via background-image, mix-blend-mode: overlay */
+  --grain-url: url('assets/textures/grain.svg');
+}
+
+/* Light theme — daylight reading. Used for accessibility, not the brand identity. */
+[data-theme="day"] {
+  --bg:           #ece4d0;
+  --bg-deep:      #ddd2b8;
+  --surface-1:    #f3ecda;
+  --surface-2:    #e6dcc2;
+  --surface-3:    #d8cdb0;
+
+  --fg-1:         #1a201c;
+  --fg-2:         #353d36;
+  --fg-3:         #5a6258;
+  --fg-4:         #8b9189;
+
+  --line:         #c8bda1;
+  --line-strong:  #8a9e85;
+
+  --accent:       var(--wax-2);
+  --accent-press: var(--wax-3);
+  --accent-fg:    #f3ecda;
+
+  --link:         #3f5a52;
+  --link-hover:   #1a201c;
+
+  --selection:    color-mix(in oklab, var(--moss-2) 35%, transparent);
+}
+
+/* ============================================================
+   TYPOGRAPHY — Garamond + Inter + JetBrains Mono
+   ============================================================ */
+:root {
+  --font-serif:  'EB Garamond', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-sans:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:   'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Scale — modular, ~1.18 ratio. Old-style figures by default. */
+  --fs-overline: 0.75rem;     /* 12 — eyebrow labels, all-caps */
+  --fs-micro:    0.8125rem;   /* 13 — meta, timestamps */
+  --fs-small:    0.875rem;    /* 14 — UI body */
+  --fs-body:     1rem;        /* 16 — body text */
+  --fs-reading:  1.125rem;    /* 18 — long-form reading default */
+  --fs-lede:     1.25rem;     /* 20 — intro paragraphs */
+  --fs-h6:       1rem;
+  --fs-h5:       1.125rem;
+  --fs-h4:       1.375rem;
+  --fs-h3:       1.75rem;
+  --fs-h2:       2.25rem;
+  --fs-h1:       3rem;
+  --fs-display:  4rem;        /* title screens only */
+
+  /* Leading */
+  --lh-tight:    1.15;
+  --lh-snug:     1.3;
+  --lh-normal:   1.5;
+  --lh-reading:  1.65;
+  --lh-loose:    1.85;
+
+  /* Tracking */
+  --tr-tight:    -0.015em;
+  --tr-normal:   0;
+  --tr-wide:     0.04em;
+  --tr-overline: 0.14em;
+}
+
+/* ============================================================
+   SPACING — 4px base, journal-named tokens
+   ============================================================ */
+:root {
+  --space-0:    0;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    24px;
+  --space-6:    32px;
+  --space-7:    48px;
+  --space-8:    64px;
+  --space-9:    96px;
+  --space-10:   128px;
+
+  /* Journal metaphors */
+  --gutter:     32px;   /* between two-page spread halves */
+  --margin:     48px;   /* outer page margin */
+  --signature:  16px;   /* between bound sections */
+
+  /* Layout */
+  --content-max: 68ch;
+  --sidebar-w:   300px;
+  --rail-w:      72px;
+}
+
+/* ============================================================
+   RADII / SHADOW / MOTION
+   ============================================================ */
+:root {
+  --r-0:    0;
+  --r-1:    4px;
+  --r-2:    8px;
+  --r-3:    10px;   /* buttons */
+  --r-4:    12px;   /* cards */
+  --r-5:    14px;   /* modals */
+  --r-pill: 999px;
+
+  /* Soft, low-opacity outer shadows */
+  --shadow-rest:    0 1px 0 0 color-mix(in oklab, var(--ink-0) 30%, transparent),
+                    0 2px 8px -2px color-mix(in oklab, var(--ink-0) 50%, transparent);
+  --shadow-raised:  0 1px 0 0 color-mix(in oklab, var(--ink-0) 35%, transparent),
+                    0 6px 16px -4px color-mix(in oklab, var(--ink-0) 60%, transparent),
+                    0 12px 32px -8px color-mix(in oklab, var(--ink-0) 50%, transparent);
+  --shadow-lifted:  0 2px 0 0 color-mix(in oklab, var(--ink-0) 40%, transparent),
+                    0 24px 48px -12px color-mix(in oklab, var(--ink-0) 70%, transparent),
+                    0 48px 96px -24px color-mix(in oklab, var(--ink-0) 60%, transparent);
+
+  /* Inner shadows for pressed / inset */
+  --shadow-inset:   inset 0 1px 0 0 color-mix(in oklab, var(--ink-0) 60%, transparent),
+                    inset 0 2px 4px -1px color-mix(in oklab, var(--ink-0) 50%, transparent);
+
+  /* Motion */
+  --ease-settle:  cubic-bezier(0.2, 0.7, 0.1, 1);    /* ink finding the page */
+  --ease-out:     cubic-bezier(0.25, 0.65, 0.3, 1);
+  --ease-inout:   cubic-bezier(0.5, 0, 0.3, 1);
+
+  --dur-instant:  120ms;
+  --dur-quick:    200ms;
+  --dur-settle:   480ms;
+  --dur-slow:     800ms;
+  --dur-sway:     10s;
+}
+
+/* ============================================================
+   ELEMENT DEFAULTS
+   ============================================================ */
+html {
+  background: var(--bg);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'onum' 1, 'kern' 1;   /* old-style figures by default */
+  font-variant-numeric: oldstyle-nums;
+}
+
+body {
+  margin: 0;
+  background:
+    var(--candle-glow),
+    var(--bg);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection { background: var(--selection); color: var(--fg-1); }
+
+/* Headings — Garamond, mostly weight 500, tight tracking */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: var(--fg-1);
+  letter-spacing: var(--tr-tight);
+  line-height: var(--lh-tight);
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--fs-h1); font-weight: 400; }
+h2 { font-size: var(--fs-h2); font-weight: 400; }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-h4); }
+h5 { font-size: var(--fs-h5); }
+h6 { font-size: var(--fs-h6); text-transform: none; }
+
+/* The display class — reserved for title screens, chapter openers */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-tight);
+  color: var(--fg-1);
+}
+
+/* Eyebrow / overline — Inter, tracked */
+.overline {
+  font-family: var(--font-sans);
+  font-size: var(--fs-overline);
+  font-weight: 500;
+  letter-spacing: var(--tr-overline);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* Body text — serif, generous leading */
+p, .prose {
+  font-family: var(--font-serif);
+  font-size: var(--fs-reading);
+  line-height: var(--lh-reading);
+  color: var(--fg-2);
+  max-width: var(--content-max);
+  text-wrap: pretty;
+}
+
+p + p { margin-top: 1em; }
+
+/* Drop cap for first paragraph in long-form */
+.prose-opening::first-letter {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 3.5em;
+  line-height: 0.9;
+  float: left;
+  padding: 0.05em 0.08em 0 0;
+  color: var(--fg-1);
+}
+
+/* UI body (small) — Inter */
+.ui, button, input, select, textarea, label, .meta, nav, .menu {
+  font-family: var(--font-sans);
+  font-size: var(--fs-small);
+  line-height: var(--lh-normal);
+  color: var(--fg-2);
+}
+
+/* Mono — annotations, transcriptions, coordinates */
+code, pre, .mono, .annotation {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--vellum-2);
+}
+
+.annotation {
+  color: var(--moon-2);
+  font-style: italic;
+}
+
+/* Links in body copy — hand-drawn underline */
+.prose a, p a {
+  color: var(--link);
+  text-decoration: none;
+  background-image:
+    linear-gradient(var(--link), var(--link));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  padding-bottom: 2px;
+  transition: color var(--dur-quick) var(--ease-out),
+              background-size var(--dur-quick) var(--ease-out);
+}
+.prose a:hover, p a:hover {
+  color: var(--link-hover);
+  background-size: 100% 2px;
+}
+
+/* Blockquote — like a margin annotation */
+blockquote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--fs-lede);
+  color: var(--fg-2);
+  border-left: 2px solid var(--moss-3);
+  padding: var(--space-2) 0 var(--space-2) var(--space-5);
+  margin: var(--space-6) 0;
+}
+
+/* Horizontal rule — replaced by ornament class */
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--line);
+  margin: var(--space-7) 0;
+}
+hr.ornament {
+  height: 24px;
+  background: center / contain no-repeat url('assets/ornaments/divider-leaves.svg');
+  background-color: transparent;
+  opacity: 0.6;
+}
+
+/* Form field defaults */
+input, textarea, select {
+  background: var(--surface-1);
+  color: var(--fg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: 10px 14px;
+  transition: border-color var(--dur-quick) var(--ease-out),
+              box-shadow var(--dur-quick) var(--ease-out);
+}
+input::placeholder, textarea::placeholder { color: var(--fg-4); }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--moss-2);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* Button base — primary uses --accent (wax/candle), ghost is transparent */
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: var(--r-3);
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: var(--fs-small);
+  transition: transform var(--dur-quick) var(--ease-out),
+              background-color var(--dur-quick) var(--ease-out),
+              box-shadow var(--dur-quick) var(--ease-out),
+              color var(--dur-quick) var(--ease-out);
+}
+button:active { transform: scale(0.985); }
+
+/* Idle-drift animation utility */
+@keyframes sway {
+  0%, 100% { transform: rotate(-1.5deg) translateY(0); }
+  50%      { transform: rotate(1.5deg) translateY(-2px); }
+}
+.sway { animation: sway var(--dur-sway) var(--ease-inout) infinite; transform-origin: top center; }
+
+/* Settle — entrance */
+@keyframes settle {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.settle { animation: settle var(--dur-settle) var(--ease-settle) forwards; }
+
+/* Ink-bleed — for first-load reveal of important text */
+@keyframes inkBleed {
+  from { opacity: 0; filter: blur(4px); letter-spacing: 0.05em; }
+  to   { opacity: 1; filter: blur(0);   letter-spacing: var(--tr-tight); }
+}
+.ink-bleed { animation: inkBleed var(--dur-slow) var(--ease-settle) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sway, .settle, .ink-bleed { animation: none !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

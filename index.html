@@ -1,136 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wild Prepare — Spells</title>
+  <link rel="stylesheet" href="colors_and_type.css">
+  <style>
+    /* ── Override dark-mode tokens for parchment surface ── */
+    :root { --fg-2: #4a3318; }
 
-<h2 class="sr-only">Wild Prepare Spells — replacement options for each of Elarien's known spells</h2>
-<style>
-  .wps { font-family: var(--font-sans); padding: 0.5rem 0 2rem; }
-  .level-header { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-tertiary); padding: 1.5rem 0 0.5rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0; }
-  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  thead th { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-tertiary); padding: 8px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); text-align: left; }
-  th.col-orig { width: 26%; }
-  th.col-alts { width: 74%; }
-  tr:not(:last-child) td { border-bottom: 0.5px solid var(--color-border-tertiary); }
-  td { padding: 10px 10px; vertical-align: middle; }
-  .spell-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
-  .spell-badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; letter-spacing: 0.04em; }
-  .badge-p { background: #FAEEDA; color: #633806; }
-  .badge-r { background: #EEEDFE; color: #3C3489; }
-  .badge-dup { background: #F1EFE8; color: #444441; font-size: 9px; }
-  .alts { display: flex; flex-wrap: wrap; gap: 5px; }
-  .alt-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 9px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); white-space: nowrap; }
-  .alt-pill.theme-fire { border-color: #EF9F27; color: #633806; background: #FAEEDA; }
-  .alt-pill.theme-ice { border-color: #85B7EB; color: #0C447C; background: #E6F1FB; }
-  .alt-pill.theme-shadow { border-color: #AFA9EC; color: #3C3489; background: #EEEDFE; }
-  .alt-pill.theme-mind { border-color: #ED93B1; color: #72243E; background: #FBEAF0; }
-  .alt-pill.theme-aoe { border-color: #5DCAA5; color: #085041; background: #E1F5EE; }
-  .alt-pill.theme-utility { border-color: #B4B2A9; color: #444441; background: #F1EFE8; }
-  .note { font-size: 11px; color: var(--color-text-tertiary); font-style: italic; margin-top: 4px; }
-  .section-wrap { margin-bottom: 1.5rem; }
-  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .filter-btn { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: background 0.1s; }
-  .filter-btn:hover { background: var(--color-background-tertiary); }
-  .filter-btn.active { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
-  .color-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-</style>
+    /* ── Shell & page surface ── */
+    html, body { height: 100%; }
 
-<div class="wps">
-  <div class="color-legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>fire / lightning</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#85B7EB"></div>cold / force</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#AFA9EC"></div>illusion / shadow</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#ED93B1"></div>enchantment / mind</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div>evocation / aoe</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#B4B2A9"></div>utility / other</div>
-  </div>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 32px 24px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in oklab, var(--wax-1) 11%, transparent), transparent 60%),
+        var(--bg);
+    }
 
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn active" data-level="all">All levels</button>
-    <button class="filter-btn" data-level="cantrip">Cantrips</button>
-    <button class="filter-btn" data-level="1">1st level</button>
-    <button class="filter-btn" data-level="2">2nd level</button>
-    <button class="filter-btn" data-level="3">3rd level</button>
-    <button class="filter-btn" data-level="4">4th level</button>
-  </div>
+    .journal-page {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 70vw;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+      background: #ede5d0;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.28),
+        0 16px 40px rgba(0,0,0,0.35);
+    }
 
-  <div class="section-wrap" data-level="cantrip">
-    <div class="level-header">Cantrips</div>
-    <table>
-      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
-      <tbody>
-        <tr><td><div class="spell-name">Fire Bolt</div></td><td><div class="alts"><span class="alt-pill theme-ice">Ray of Frost</span><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-ice">Frostbite</span><span class="alt-pill theme-aoe">Toll the Dead</span></div></td></tr>
-        <tr><td><div class="spell-name">Sorcerous Burst</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-aoe">Toll the Dead</span><span class="alt-pill theme-shadow">Minor Illusion</span></div><div class="note">Random damage type lost — replace with a wild-feeling cantrip</div></td></tr>
-        <tr><td><div class="spell-name">Thunderclap</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-utility">Gust</span><span class="alt-pill theme-aoe">Toll the Dead</span><span class="alt-pill theme-mind">Vicious Mockery</span></div></td></tr>
-        <tr><td><div class="spell-name">Mind Sliver</div></td><td><div class="alts"><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-mind">True Strike</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-aoe">Toll the Dead</span></div></td></tr>
-        <tr><td><div class="spell-name">Shocking Grasp</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-fire">Green-Flame Blade</span><span class="alt-pill theme-ice">Ray of Frost</span><span class="alt-pill theme-ice">Chill Touch</span></div></td></tr>
-        <tr><td><div class="spell-name">Prestidigitation</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Minor Illusion</span><span class="alt-pill theme-utility">Thaumaturgy</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-mind">Friends</span></div></td></tr>
-        <tr><td><div class="spell-name">Mage Hand</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Minor Illusion</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-utility">Encode Thoughts</span><span class="alt-pill theme-mind">Friends</span></div></td></tr>
-      </tbody>
-    </table>
-  </div>
+    /* ── Page header ── */
+    .page-eyebrow {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(60, 40, 22, 0.52);
+      margin-bottom: 10px;
+    }
 
-  <div class="section-wrap" data-level="1">
-    <div class="level-header">1st Level</div>
-    <table>
-      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
-      <tbody>
-        <tr><td><div class="spell-name">Magic Missile</div></td><td><div class="alts"><span class="alt-pill theme-fire">Chromatic Orb</span><span class="alt-pill theme-fire">Chaos Bolt</span><span class="alt-pill theme-ice">Ice Knife</span><span class="alt-pill theme-fire">Witch Bolt</span><span class="alt-pill theme-aoe">Thunderwave</span></div></td></tr>
-        <tr><td><div class="spell-name">Mage Armor</div></td><td><div class="alts"><span class="alt-pill theme-utility">Shield</span><span class="alt-pill theme-utility">False Life</span><span class="alt-pill theme-utility">Absorb Elements</span><span class="alt-pill theme-utility">Feather Fall</span></div></td></tr>
-        <tr><td><div class="spell-name">Grease</div></td><td><div class="alts"><span class="alt-pill theme-mind">Sleep</span><span class="alt-pill theme-fire">Burning Hands</span><span class="alt-pill theme-shadow">Color Spray</span><span class="alt-pill theme-utility">Fog Cloud</span><span class="alt-pill theme-mind">Tasha's Hideous Laughter</span></div></td></tr>
-        <tr><td><div class="spell-name">Silent Image <span class="spell-badge badge-p">P</span></div></td><td><div class="alts"><span class="alt-pill theme-shadow">Disguise Self</span><span class="alt-pill theme-mind">Charm Person</span><span class="alt-pill theme-mind">Cause Fear</span><span class="alt-pill theme-utility">Distort Value</span></div></td></tr>
-        <tr><td><div class="spell-name">Detect Magic <span class="spell-badge badge-r">R</span></div></td><td><div class="alts"><span class="alt-pill theme-utility">Identify</span><span class="alt-pill theme-utility">Comprehend Languages</span><span class="alt-pill theme-utility">Find Familiar</span><span class="alt-pill theme-utility">Unseen Servant</span></div><div class="note">Ritual tag retained if replacement also has [R]</div></td></tr>
-      </tbody>
-    </table>
-  </div>
+    .page-title {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 36px;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      color: #1a120a;
+      margin: 0 0 6px;
+    }
 
-  <div class="section-wrap" data-level="2">
-    <div class="level-header">2nd Level</div>
-    <table>
-      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
-      <tbody>
-        <tr><td><div class="spell-name">Flaming Sphere</div></td><td><div class="alts"><span class="alt-pill theme-fire">Scorching Ray</span><span class="alt-pill theme-fire">Aganazzar's Scorcher</span><span class="alt-pill theme-fire">Dragon's Breath</span><span class="alt-pill theme-ice">Melf's Acid Arrow</span></div></td></tr>
-        <tr><td><div class="spell-name">Shatter</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-mind">Crown of Madness</span><span class="alt-pill theme-mind">Hold Person</span><span class="alt-pill theme-aoe">Maximilian's Earthen Grasp</span></div></td></tr>
-        <tr><td><div class="spell-name">Phantasmal Force</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Shadow Blade</span><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-mind">Crown of Madness</span></div></td></tr>
-        <tr><td><div class="spell-name">Detect Thoughts</div></td><td><div class="alts"><span class="alt-pill theme-mind">Suggestion</span><span class="alt-pill theme-mind">Enthrall</span><span class="alt-pill theme-mind">Crown of Madness</span><span class="alt-pill theme-utility">Locate Object</span></div></td></tr>
-        <tr><td><div class="spell-name">Invisibility <span class="spell-badge badge-dup">×2</span></div></td><td><div class="alts"><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-utility">Spider Climb</span><span class="alt-pill theme-utility">Rope Trick</span><span class="alt-pill theme-utility">Nystul's Magic Aura</span></div><div class="note">One slot is prepared (P) — roll separately for each</div></td></tr>
-        <tr><td><div class="spell-name">Misty Step <span class="spell-badge badge-dup">×2</span></div></td><td><div class="alts"><span class="alt-pill theme-utility">Spider Climb</span><span class="alt-pill theme-utility">Levitate</span><span class="alt-pill theme-utility">Earthbind</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-utility">Rope Trick</span></div><div class="note">2nd-level teleport is unique — replacements shift the mobility theme</div></td></tr>
-      </tbody>
-    </table>
-  </div>
+    .page-subtitle {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      color: rgba(60, 40, 22, 0.6);
+      margin-bottom: 0;
+    }
 
-  <div class="section-wrap" data-level="3">
-    <div class="level-header">3rd Level</div>
-    <table>
-      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
-      <tbody>
-        <tr><td><div class="spell-name">Fireball</div></td><td><div class="alts"><span class="alt-pill theme-fire">Lightning Bolt</span><span class="alt-pill theme-aoe">Erupting Earth</span><span class="alt-pill theme-ice">Sleet Storm</span><span class="alt-pill theme-aoe">Stinking Cloud</span><span class="alt-pill theme-fire">Thunder Step</span></div></td></tr>
-        <tr><td><div class="spell-name">Fear</div></td><td><div class="alts"><span class="alt-pill theme-mind">Hypnotic Pattern</span><span class="alt-pill theme-mind">Slow</span><span class="alt-pill theme-mind">Enemies Abound</span><span class="alt-pill theme-mind">Bestow Curse</span></div></td></tr>
-        <tr><td><div class="spell-name">Counterspell</div></td><td><div class="alts"><span class="alt-pill theme-utility">Dispel Magic</span><span class="alt-pill theme-mind">Slow</span><span class="alt-pill theme-mind">Hypnotic Pattern</span><span class="alt-pill theme-utility">Leomund's Tiny Hut</span></div><div class="note">Losing Counterspell is a high chaos option — DM discretion advised</div></td></tr>
-      </tbody>
-    </table>
-  </div>
+    /* ── Color legend ── */
+    .color-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      margin-bottom: 0;
+    }
 
-  <div class="section-wrap" data-level="4">
-    <div class="level-header">4th Level</div>
-    <table>
-      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
-      <tbody>
-        <tr><td><div class="spell-name">Wild Radiance <span class="spell-badge badge-dup" style="background:#E1F5EE;color:#085041">HB</span></div></td><td><div class="alts"><span class="alt-pill theme-mind">Confusion</span><span class="alt-pill theme-utility">Banishment</span><span class="alt-pill theme-shadow">Polymorph</span><span class="alt-pill theme-ice">Ice Storm</span><span class="alt-pill theme-fire">Vitriolic Sphere</span><span class="alt-pill theme-utility">Fire Shield</span><span class="alt-pill theme-ice">Blight</span></div><div class="note">HB = homebrew — DM should confirm which 4th-level spells are on the approved list</div></td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: rgba(60, 40, 22, 0.65);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+
+    /* ── Screen-reader only ── */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ── Search ── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(60, 40, 22, 0.4);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      padding: 7px 12px 7px 34px;
+      border-radius: var(--r-3);
+      border: 1px solid rgba(60, 40, 22, 0.22);
+      background: rgba(0, 0, 0, 0.04);
+      color: #1a120a;
+      outline: none;
+      transition: border-color 150ms, box-shadow 150ms;
+      box-sizing: border-box;
+    }
+
+    .search-input::placeholder { color: rgba(60, 40, 22, 0.38); }
+
+    .search-input:focus {
+      border-color: rgba(60, 40, 22, 0.45);
+      box-shadow: 0 0 0 3px rgba(60, 40, 22, 0.08);
+    }
+
+    /* Highlight matched text */
+    mark {
+      background: rgba(216, 180, 106, 0.45);
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    .no-results {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 14px;
+      color: rgba(60, 40, 22, 0.45);
+      padding: 18px 0 6px;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      border: 0;
+      padding: 0;
+      margin: 0 0 12px;
+    }
+
+    .filter-btn {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 13px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(60, 40, 22, 0.22);
+      background: rgba(0, 0, 0, 0.03);
+      color: rgba(60, 40, 22, 0.6);
+      cursor: pointer;
+      transition: background 200ms var(--ease-out), color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+      letter-spacing: 0.01em;
+    }
+
+    .filter-btn:hover {
+      background: rgba(60, 40, 22, 0.07);
+      color: rgba(60, 40, 22, 0.85);
+      border-color: rgba(60, 40, 22, 0.35);
+    }
+
+    .filter-btn.active {
+      background: color-mix(in oklab, var(--moss-3) 20%, transparent);
+      color: #1f3a24;
+      border-color: var(--moss-3);
+    }
+
+    .filter-btn:active { transform: scale(0.985); }
+
+    /* ── Section (level) ── */
+    .section-wrap { margin-bottom: 0; }
+    .section-wrap + .section-wrap { margin-top: 6px; }
+
+    .level-header {
+      font-family: var(--font-sans);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(60, 40, 22, 0.50);
+      padding: 18px 0 8px;
+      border-bottom: 0.5px solid rgba(60, 40, 22, 0.18);
+      margin-bottom: 0;
+    }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead th {
+      font-family: var(--font-sans);
+      font-size: 10.5px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: rgba(60, 40, 22, 0.45);
+      padding: 8px 8px;
+      border-bottom: 0.5px solid rgba(60, 40, 22, 0.18);
+      text-align: left;
+    }
+
+    th.col-orig { width: 26%; }
+    th.col-alts { width: 74%; }
+
+    tr:not(:last-child) td {
+      border-bottom: 0.5px solid rgba(60, 40, 22, 0.12);
+    }
+
+    td {
+      padding: 10px 8px;
+      vertical-align: middle;
+    }
+
+    /* ── Spell name & badges ── */
+    .spell-name {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a120a;
+      line-height: 1.3;
+    }
+
+    .spell-badge {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-left: 5px;
+      vertical-align: middle;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-p { background: rgba(216,180,106,0.28); color: #5a4520; border: 0.5px solid rgba(216,180,106,0.6); }
+    .badge-r { background: rgba(107,138,115,0.20); color: #2c4a32; border: 0.5px solid rgba(107,138,115,0.45); }
+    .badge-dup { background: rgba(60,40,22,0.10); color: rgba(60,40,22,0.60); font-size: 9px; border: 0.5px solid rgba(60,40,22,0.22); }
+
+    /* ── Alt spell pills ── */
+    .alts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .alt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: var(--r-pill);
+      border: 0.5px solid rgba(60, 40, 22, 0.22);
+      color: rgba(60, 40, 22, 0.68);
+      background: rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+      transition: background 150ms var(--ease-out);
+    }
+
+    .alt-pill:hover { background: rgba(0, 0, 0, 0.08); }
+
+    /* Theme tints — adjusted for warm parchment */
+    .alt-pill.theme-fire   { border-color: rgba(191,128,50,0.55); color: #633806; background: rgba(250,214,160,0.42); }
+    .alt-pill.theme-ice    { border-color: rgba(100,155,200,0.55); color: #0e3a62; background: rgba(200,225,248,0.40); }
+    .alt-pill.theme-shadow { border-color: rgba(150,145,195,0.50); color: #38307a; background: rgba(210,208,245,0.38); }
+    .alt-pill.theme-mind   { border-color: rgba(200,130,165,0.50); color: #6a1f3a; background: rgba(245,210,225,0.40); }
+    .alt-pill.theme-aoe    { border-color: rgba(70,175,140,0.50); color: #084534; background: rgba(195,238,220,0.42); }
+    .alt-pill.theme-utility{ border-color: rgba(130,115,90,0.40); color: rgba(60,40,22,0.70); background: rgba(60,40,22,0.06); }
+
+    /* ── Row note ── */
+    .note {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 11.5px;
+      color: rgba(60, 40, 22, 0.50);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* ── Page folio ── */
+    .folio {
+      text-align: right;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 12px;
+      color: rgba(60, 40, 22, 0.38);
+      letter-spacing: 0.02em;
+      margin-top: 36px;
+      padding-top: 12px;
+      border-top: 0.5px solid rgba(60, 40, 22, 0.14);
+    }
+
+    /* ── Two-column spellbook layout ── */
+    .mechanic-section {
+      padding: 44px 44px 44px 48px;
+      border-right: 1px solid rgba(60, 40, 22, 0.14);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(60, 40, 22, 0.2) transparent;
+    }
+
+    .spells-section {
+      padding: 0 0 44px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(60, 40, 22, 0.2) transparent;
+    }
+
+    .controls-bar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #ede5d0;
+      padding: 24px 48px 14px 44px;
+      border-bottom: 1px solid rgba(60, 40, 22, 0.12);
+    }
+
+    /* push table content away from controls */
+    #tables-root, .folio { padding: 0 48px 0 44px; }
+
+    /* ── Mechanic description ── */
+    .mechanic-grid {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 22px 28px;
+      margin-top: 32px;
+    }
+
+    .mg-label {
+      font-family: var(--font-sans);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: rgba(60, 40, 22, 0.42);
+      padding-top: 3px;
+    }
+
+    .mg-value {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      color: #2a1a0e;
+      line-height: 1.65;
+    }
+
+    .mg-value p { margin: 0; }
+    .mg-value p + p { margin-top: 6px; }
+
+    .trigger-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .trigger-chip {
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: var(--r-pill);
+      background: rgba(60, 40, 22, 0.07);
+      color: rgba(60, 40, 22, 0.65);
+      border: 1px solid rgba(60, 40, 22, 0.14);
+    }
+
+    .rules-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .rules-list li {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      color: #2a1a0e;
+      line-height: 1.55;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .rules-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: rgba(60, 40, 22, 0.3);
+    }
+
+    .mechanic-intent {
+      margin: 30px 0 0;
+      padding: 14px 18px;
+      background: rgba(60, 40, 22, 0.05);
+      border-left: 2px solid rgba(107, 138, 115, 0.55);
+      border-radius: 0 6px 6px 0;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 14px;
+      color: rgba(60, 40, 22, 0.6);
+      line-height: 1.65;
+    }
+
+    /* ── Settle entrance ── */
+    .journal-page { animation: settle 480ms var(--ease-settle) both; }
+
+    /* ── Responsive ── */
+    @media (max-width: 760px) {
+      html, body { height: auto; overflow: auto; }
+      body { align-items: flex-start; padding: 16px 12px 48px; }
+      .journal-page {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+      .mechanic-section {
+        border-right: none;
+        border-bottom: 1px solid rgba(60, 40, 22, 0.14);
+        padding: 32px 24px;
+        overflow: visible;
+      }
+      .spells-section { padding: 0 0 36px; overflow: visible; }
+      .controls-bar { position: static; padding: 24px 24px 14px; }
+      #tables-root, .folio { padding: 0 24px; }
+      .page-title { font-size: 28px; }
+      .mechanic-grid { grid-template-columns: 1fr; gap: 16px; }
+      .mg-label { padding-top: 0; }
+    }
+
+    /* ── Loader ── */
+    .loader {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(60, 40, 22, 0.4);
+    }
+
+    .loader-ring {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(60, 40, 22, 0.15);
+      border-top-color: rgba(60, 40, 22, 0.45);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── DM note ── */
+    .dm-note {
+      margin: 10px 0 0;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: rgba(60, 40, 22, 0.42);
+    }
+
+    .dm-note a {
+      color: rgba(60, 40, 22, 0.55);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+    }
+
+    .dm-note a:hover { color: rgba(60, 40, 22, 0.85); text-decoration-style: solid; }
+  </style>
+</head>
+<body>
+
+<main class="journal-page" role="main">
+
+  <!-- ── Section 1: Mechanic description ── -->
+  <section class="mechanic-section" aria-labelledby="mechanic-title">
+
+    <h1 class="page-title" id="mechanic-title">Wild prepare spells</h1>
+    <p class="page-subtitle">Temporary, unstable access to magic the sorcerer shouldn't fully be able to wield.</p>
+
+    <div class="mechanic-grid">
+
+      <div class="mg-label">When</div>
+      <div class="mg-value">
+        <p>At the DM's discretion, the sorcerer's spell list may become unstable during any of:</p>
+        <div class="trigger-chips">
+          <span class="trigger-chip">Long rest</span>
+          <span class="trigger-chip">Short rest</span>
+          <span class="trigger-chip">Major story event</span>
+          <span class="trigger-chip">Whenever appropriate</span>
+        </div>
+      </div>
+
+      <div class="mg-label">What changes</div>
+      <div class="mg-value">
+        <p>The sorcerer selects a number of their known spells. Those spells become <em>unstable</em> and are temporarily replaced by randomly rolled spells of the same level, drawn from a DM-approved Sorcerer or Wizard spell list or table.</p>
+      </div>
+
+      <div class="mg-label">Rules</div>
+      <div class="mg-value">
+        <ul class="rules-list">
+          <li>Replacements count as Sorcerer spells and use Charisma as the casting modifier.</li>
+          <li>Each replacement occupies the same spell slot level as the spell it replaced.</li>
+          <li>Cannot exceed spell levels the sorcerer could normally cast.</li>
+          <li>Temporary — may change again after future rests or magical events.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <blockquote class="mechanic-intent">
+      The intent is not controlled optimization, but unstable access to magic the sorcerer should not fully be able to wield.
+    </blockquote>
+
+  </section>
+
+  <!-- ── Section 2: Spell reference table ── -->
+  <section class="spells-section" aria-labelledby="spells-title">
+
+    <h2 class="sr-only" id="spells-title">Known spells — wild replacement options</h2>
+
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="searchInput" type="search" placeholder="Search spells…" autocomplete="off" spellcheck="false">
+      </div>
+
+      <fieldset class="filter-bar" id="filterBar">
+        <legend class="sr-only">Filter by spell level</legend>
+        <button class="filter-btn active" data-level="all">All levels</button>
+        <button class="filter-btn" data-level="cantrip">Cantrips</button>
+        <button class="filter-btn" data-level="1">1st level</button>
+        <button class="filter-btn" data-level="2">2nd level</button>
+        <button class="filter-btn" data-level="3">3rd level</button>
+        <button class="filter-btn" data-level="4">4th level</button>
+      </fieldset>
+
+      <div class="color-legend" aria-label="Spell school colour key">
+        <div class="legend-item"><div class="legend-dot" style="background:#bf8032"></div>fire / lightning</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#649bc8"></div>cold / force</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9691c3"></div>illusion / shadow</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c882a5"></div>enchantment / mind</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#46af8c"></div>evocation / aoe</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#82735a"></div>utility / other</div>
+      </div>
+
+      <p class="dm-note">
+        DM edits: <a href="https://docs.google.com/spreadsheets/d/10utMfP_t3T11Hq3x0ftySwmi1loywdVH-_nVUEkz2_s/edit?gid=1541159395#gid=1541159395" target="_blank" rel="noopener">spell list spreadsheet ↗</a>
+      </p>
+    </div>
+
+    <div id="tables-root"></div>
+
+    <div class="folio" aria-hidden="true">Wild Prepare</div>
+
+  </section><!-- /spells-section -->
+</main>
 
 <script>
-  const btns = document.querySelectorAll('.filter-btn');
-  const sections = document.querySelectorAll('.section-wrap');
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      btns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const level = btn.dataset.level;
-      sections.forEach(s => {
-        s.style.display = (level === 'all' || s.dataset.level === level) ? '' : 'none';
+  // To load from Google Sheets: File → Share → Publish to web → CSV, then paste the URL here.
+  const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNYftCQ3OfaxcQYHlSwjl1Jnk425z3dG3zm5XgRArTybVK-Wp7yg12rryuE3JKQtMmMcV2fW04Nnmq/pub?gid=1541159395&single=true&output=csv'; // or a Google Sheets "publish to web" CSV URL
+
+  // ── CSV parser (handles quoted fields) ──────────────────────────────────────
+  function parseCSV(text) {
+    const rows = [];
+    for (const raw of text.trim().split('\n')) {
+      const line = raw.trim();
+      if (!line) continue;
+      const fields = [];
+      let cur = '', inQuote = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
+          else inQuote = !inQuote;
+        } else if (ch === ',' && !inQuote) {
+          fields.push(cur); cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      fields.push(cur);
+      rows.push(fields);
+    }
+    return rows;
+  }
+
+  // ── Badge config ─────────────────────────────────────────────────────────────
+  const BADGES = {
+    P:  { cls: 'badge-p', label: 'P' },
+    R:  { cls: 'badge-r', label: 'R' },
+    x2: { cls: 'badge-dup', label: '×2' },
+    HB: { cls: 'badge-dup', label: 'HB',
+          style: 'background:rgba(70,175,140,0.20);color:#084534;border-color:rgba(70,175,140,0.45)' },
+  };
+
+  const LEVEL_LABELS = {
+    cantrip: 'Cantrips',
+    '1': '1st Level', '2': '2nd Level',
+    '3': '3rd Level', '4': '4th Level',
+  };
+
+  // ── Rendering ────────────────────────────────────────────────────────────────
+  function buildNameCell(spell, badges, query) {
+    const div = document.createElement('div');
+    div.className = 'spell-name';
+    div.appendChild(highlight(spell, query));
+    for (const key of badges) {
+      const cfg = BADGES[key];
+      if (!cfg) continue;
+      const span = document.createElement('span');
+      span.className = 'spell-badge ' + cfg.cls;
+      if (cfg.style) span.setAttribute('style', cfg.style);
+      span.textContent = cfg.label;
+      div.appendChild(span);
+    }
+    return div;
+  }
+
+  function highlight(text, query) {
+    if (!query) return document.createTextNode(text);
+    const idx = text.toLowerCase().indexOf(query);
+    if (idx === -1) return document.createTextNode(text);
+    const frag = document.createDocumentFragment();
+    frag.appendChild(document.createTextNode(text.slice(0, idx)));
+    const mark = document.createElement('mark');
+    mark.textContent = text.slice(idx, idx + query.length);
+    frag.appendChild(mark);
+    frag.appendChild(document.createTextNode(text.slice(idx + query.length)));
+    return frag;
+  }
+
+  function buildAltsCell(alts, note, query) {
+    const td = document.createElement('td');
+    const wrap = document.createElement('div');
+    wrap.className = 'alts';
+    for (const alt of alts) {
+      const [theme, ...rest] = alt.split(':');
+      const name = rest.join(':');
+      if (!name) continue;
+      const span = document.createElement('span');
+      span.className = 'alt-pill theme-' + theme;
+      span.appendChild(highlight(name, query));
+      wrap.appendChild(span);
+    }
+    td.appendChild(wrap);
+    if (note) {
+      const p = document.createElement('div');
+      p.className = 'note';
+      p.textContent = note;
+      td.appendChild(p);
+    }
+    return td;
+  }
+
+  // spells data kept in module scope so re-renders can highlight
+  let allSpells = [];
+
+  function renderSections(spells, query = '') {
+    const groups = new Map();
+    for (const s of spells) {
+      if (!groups.has(s.level)) groups.set(s.level, []);
+      groups.get(s.level).push(s);
+    }
+
+    const root = document.getElementById('tables-root');
+    root.innerHTML = '';
+
+    for (const [level, rows] of groups) {
+      const section = document.createElement('div');
+      section.className = 'section-wrap';
+      section.dataset.level = level;
+
+      const header = document.createElement('div');
+      header.className = 'level-header';
+      header.textContent = LEVEL_LABELS[level] ?? level;
+      section.appendChild(header);
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = '<tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr>';
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      for (const spell of rows) {
+        const searchText = [spell.spell, ...spell.alts.map(a => a.split(':').slice(1).join(':'))].join(' ').toLowerCase();
+        const tr = document.createElement('tr');
+        tr.dataset.search = searchText;
+        const tdName = document.createElement('td');
+        tdName.appendChild(buildNameCell(spell.spell, spell.badges, query));
+        tr.appendChild(tdName);
+        tr.appendChild(buildAltsCell(spell.alts, spell.note, query));
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      section.appendChild(table);
+      root.appendChild(section);
+    }
+  }
+
+  // ── Unified filter + search ──────────────────────────────────────────────────
+  let activeLevel = 'all';
+
+  function applyFilters() {
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    // Re-render with highlights whenever query changes
+    renderSections(allSpells, query);
+
+    let anyVisible = false;
+    document.querySelectorAll('.section-wrap').forEach(section => {
+      const levelMatch = activeLevel === 'all' || section.dataset.level === activeLevel;
+      if (!levelMatch) { section.style.display = 'none'; return; }
+
+      let sectionHasMatch = false;
+      section.querySelectorAll('tr[data-search]').forEach(tr => {
+        const matches = !query || tr.dataset.search.includes(query);
+        tr.style.display = matches ? '' : 'none';
+        if (matches) sectionHasMatch = true;
+      });
+
+      section.style.display = sectionHasMatch ? '' : 'none';
+      if (sectionHasMatch) anyVisible = true;
+    });
+
+    // Empty state
+    const existing = document.getElementById('no-results');
+    if (!anyVisible) {
+      if (!existing) {
+        const p = document.createElement('p');
+        p.id = 'no-results';
+        p.className = 'no-results';
+        p.textContent = 'No spells match.';
+        document.getElementById('tables-root').after(p);
+      }
+    } else {
+      existing?.remove();
+    }
+  }
+
+  function bindFilter() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeLevel = btn.dataset.level;
+        applyFilters();
       });
     });
-  });
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+  }
+
+  // ── Load ─────────────────────────────────────────────────────────────────────
+  document.getElementById('tables-root').innerHTML =
+    '<div class="loader"><div class="loader-ring"></div>Loading spells…</div>';
+
+  fetch(DATA_URL)
+    .then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    })
+    .then(text => {
+      const [, ...dataRows] = parseCSV(text); // skip header row
+      const spells = dataRows.map(([level, spell, badgeStr, altsStr, note]) => ({
+        level: level.trim(),
+        spell: spell.trim(),
+        badges: badgeStr.trim() ? badgeStr.trim().split(/\s+/) : [],
+        alts: altsStr.trim() ? altsStr.trim().split('|') : [],
+        note: note?.trim() ?? '',
+      }));
+      allSpells = spells;
+      renderSections(spells);
+      bindFilter();
+    })
+    .catch(() => {
+      document.getElementById('tables-root').innerHTML =
+        '<p class="note" style="padding:12px 0">Could not load spell data — ' +
+        'if using a local file, open with a server (e.g. VS Code Live Server); ' +
+        'if using a Google Sheets URL, make sure the sheet is published to the web as CSV.</p>';
+    });
 </script>
+</body>
+</html>
