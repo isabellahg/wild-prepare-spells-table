@@ -989,6 +989,28 @@
     document.getElementById('searchInput').addEventListener('input', applyFilters);
   }
 
+  // ── Unstable persistence ─────────────────────────────────────────────────────
+  const STORAGE_KEY = 'wild-prepare-unstable';
+
+  function saveUnstableState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...unstableMap]));
+    } catch (_) {}
+  }
+
+  function loadUnstableState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const entries = JSON.parse(raw);
+      for (const [name, info] of entries) {
+        if (allSpells.some(s => s.spell === name)) {
+          unstableMap.set(name, info);
+        }
+      }
+    } catch (_) {}
+  }
+
   // ── Unstable controls ────────────────────────────────────────────────────────
   function updateUnstableBtn() {
     const btn = document.getElementById('makeUnstableBtn');
@@ -1012,6 +1034,7 @@
       unstableMap.set(name, pickReplacement(spell.alts));
     }
     selectedSpells.clear();
+    saveUnstableState();
     applyFilters();
     updateUnstableBtn();
     updateResetAllBtn();
@@ -1020,6 +1043,7 @@
   function resetSpell(name) {
     unstableMap.delete(name);
     selectedSpells.delete(name);
+    saveUnstableState();
     applyFilters();
     updateUnstableBtn();
     updateResetAllBtn();
@@ -1030,6 +1054,7 @@
     document.getElementById('resetAllBtn').addEventListener('click', () => {
       unstableMap.clear();
       selectedSpells.clear();
+      saveUnstableState();
       applyFilters();
       updateUnstableBtn();
       updateResetAllBtn();
@@ -1055,9 +1080,11 @@
         note: note?.trim() ?? '',
       }));
       allSpells = spells;
+      loadUnstableState();
       renderSections(spells);
       bindFilter();
       bindUnstableControls();
+      updateResetAllBtn();
     })
     .catch(() => {
       document.getElementById('tables-root').innerHTML =
