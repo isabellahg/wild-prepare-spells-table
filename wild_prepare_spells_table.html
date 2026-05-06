@@ -1,0 +1,136 @@
+
+<h2 class="sr-only">Wild Prepare Spells — replacement options for each of Elarien's known spells</h2>
+<style>
+  .wps { font-family: var(--font-sans); padding: 0.5rem 0 2rem; }
+  .level-header { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-tertiary); padding: 1.5rem 0 0.5rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead th { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-tertiary); padding: 8px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); text-align: left; }
+  th.col-orig { width: 26%; }
+  th.col-alts { width: 74%; }
+  tr:not(:last-child) td { border-bottom: 0.5px solid var(--color-border-tertiary); }
+  td { padding: 10px 10px; vertical-align: middle; }
+  .spell-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .spell-badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; letter-spacing: 0.04em; }
+  .badge-p { background: #FAEEDA; color: #633806; }
+  .badge-r { background: #EEEDFE; color: #3C3489; }
+  .badge-dup { background: #F1EFE8; color: #444441; font-size: 9px; }
+  .alts { display: flex; flex-wrap: wrap; gap: 5px; }
+  .alt-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 9px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); white-space: nowrap; }
+  .alt-pill.theme-fire { border-color: #EF9F27; color: #633806; background: #FAEEDA; }
+  .alt-pill.theme-ice { border-color: #85B7EB; color: #0C447C; background: #E6F1FB; }
+  .alt-pill.theme-shadow { border-color: #AFA9EC; color: #3C3489; background: #EEEDFE; }
+  .alt-pill.theme-mind { border-color: #ED93B1; color: #72243E; background: #FBEAF0; }
+  .alt-pill.theme-aoe { border-color: #5DCAA5; color: #085041; background: #E1F5EE; }
+  .alt-pill.theme-utility { border-color: #B4B2A9; color: #444441; background: #F1EFE8; }
+  .note { font-size: 11px; color: var(--color-text-tertiary); font-style: italic; margin-top: 4px; }
+  .section-wrap { margin-bottom: 1.5rem; }
+  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .filter-btn { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: background 0.1s; }
+  .filter-btn:hover { background: var(--color-background-tertiary); }
+  .filter-btn.active { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .color-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+
+<div class="wps">
+  <div class="color-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>fire / lightning</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#85B7EB"></div>cold / force</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#AFA9EC"></div>illusion / shadow</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ED93B1"></div>enchantment / mind</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div>evocation / aoe</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#B4B2A9"></div>utility / other</div>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-level="all">All levels</button>
+    <button class="filter-btn" data-level="cantrip">Cantrips</button>
+    <button class="filter-btn" data-level="1">1st level</button>
+    <button class="filter-btn" data-level="2">2nd level</button>
+    <button class="filter-btn" data-level="3">3rd level</button>
+    <button class="filter-btn" data-level="4">4th level</button>
+  </div>
+
+  <div class="section-wrap" data-level="cantrip">
+    <div class="level-header">Cantrips</div>
+    <table>
+      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
+      <tbody>
+        <tr><td><div class="spell-name">Fire Bolt</div></td><td><div class="alts"><span class="alt-pill theme-ice">Ray of Frost</span><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-ice">Frostbite</span><span class="alt-pill theme-aoe">Toll the Dead</span></div></td></tr>
+        <tr><td><div class="spell-name">Sorcerous Burst</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-aoe">Toll the Dead</span><span class="alt-pill theme-shadow">Minor Illusion</span></div><div class="note">Random damage type lost — replace with a wild-feeling cantrip</div></td></tr>
+        <tr><td><div class="spell-name">Thunderclap</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-utility">Gust</span><span class="alt-pill theme-aoe">Toll the Dead</span><span class="alt-pill theme-mind">Vicious Mockery</span></div></td></tr>
+        <tr><td><div class="spell-name">Mind Sliver</div></td><td><div class="alts"><span class="alt-pill theme-ice">Chill Touch</span><span class="alt-pill theme-mind">True Strike</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-aoe">Toll the Dead</span></div></td></tr>
+        <tr><td><div class="spell-name">Shocking Grasp</div></td><td><div class="alts"><span class="alt-pill theme-aoe">Booming Blade</span><span class="alt-pill theme-fire">Green-Flame Blade</span><span class="alt-pill theme-ice">Ray of Frost</span><span class="alt-pill theme-ice">Chill Touch</span></div></td></tr>
+        <tr><td><div class="spell-name">Prestidigitation</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Minor Illusion</span><span class="alt-pill theme-utility">Thaumaturgy</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-mind">Friends</span></div></td></tr>
+        <tr><td><div class="spell-name">Mage Hand</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Minor Illusion</span><span class="alt-pill theme-utility">Message</span><span class="alt-pill theme-utility">Encode Thoughts</span><span class="alt-pill theme-mind">Friends</span></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-wrap" data-level="1">
+    <div class="level-header">1st Level</div>
+    <table>
+      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
+      <tbody>
+        <tr><td><div class="spell-name">Magic Missile</div></td><td><div class="alts"><span class="alt-pill theme-fire">Chromatic Orb</span><span class="alt-pill theme-fire">Chaos Bolt</span><span class="alt-pill theme-ice">Ice Knife</span><span class="alt-pill theme-fire">Witch Bolt</span><span class="alt-pill theme-aoe">Thunderwave</span></div></td></tr>
+        <tr><td><div class="spell-name">Mage Armor</div></td><td><div class="alts"><span class="alt-pill theme-utility">Shield</span><span class="alt-pill theme-utility">False Life</span><span class="alt-pill theme-utility">Absorb Elements</span><span class="alt-pill theme-utility">Feather Fall</span></div></td></tr>
+        <tr><td><div class="spell-name">Grease</div></td><td><div class="alts"><span class="alt-pill theme-mind">Sleep</span><span class="alt-pill theme-fire">Burning Hands</span><span class="alt-pill theme-shadow">Color Spray</span><span class="alt-pill theme-utility">Fog Cloud</span><span class="alt-pill theme-mind">Tasha's Hideous Laughter</span></div></td></tr>
+        <tr><td><div class="spell-name">Silent Image <span class="spell-badge badge-p">P</span></div></td><td><div class="alts"><span class="alt-pill theme-shadow">Disguise Self</span><span class="alt-pill theme-mind">Charm Person</span><span class="alt-pill theme-mind">Cause Fear</span><span class="alt-pill theme-utility">Distort Value</span></div></td></tr>
+        <tr><td><div class="spell-name">Detect Magic <span class="spell-badge badge-r">R</span></div></td><td><div class="alts"><span class="alt-pill theme-utility">Identify</span><span class="alt-pill theme-utility">Comprehend Languages</span><span class="alt-pill theme-utility">Find Familiar</span><span class="alt-pill theme-utility">Unseen Servant</span></div><div class="note">Ritual tag retained if replacement also has [R]</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-wrap" data-level="2">
+    <div class="level-header">2nd Level</div>
+    <table>
+      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
+      <tbody>
+        <tr><td><div class="spell-name">Flaming Sphere</div></td><td><div class="alts"><span class="alt-pill theme-fire">Scorching Ray</span><span class="alt-pill theme-fire">Aganazzar's Scorcher</span><span class="alt-pill theme-fire">Dragon's Breath</span><span class="alt-pill theme-ice">Melf's Acid Arrow</span></div></td></tr>
+        <tr><td><div class="spell-name">Shatter</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-mind">Crown of Madness</span><span class="alt-pill theme-mind">Hold Person</span><span class="alt-pill theme-aoe">Maximilian's Earthen Grasp</span></div></td></tr>
+        <tr><td><div class="spell-name">Phantasmal Force</div></td><td><div class="alts"><span class="alt-pill theme-shadow">Shadow Blade</span><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-mind">Crown of Madness</span></div></td></tr>
+        <tr><td><div class="spell-name">Detect Thoughts</div></td><td><div class="alts"><span class="alt-pill theme-mind">Suggestion</span><span class="alt-pill theme-mind">Enthrall</span><span class="alt-pill theme-mind">Crown of Madness</span><span class="alt-pill theme-utility">Locate Object</span></div></td></tr>
+        <tr><td><div class="spell-name">Invisibility <span class="spell-badge badge-dup">×2</span></div></td><td><div class="alts"><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-shadow">Mirror Image</span><span class="alt-pill theme-utility">Spider Climb</span><span class="alt-pill theme-utility">Rope Trick</span><span class="alt-pill theme-utility">Nystul's Magic Aura</span></div><div class="note">One slot is prepared (P) — roll separately for each</div></td></tr>
+        <tr><td><div class="spell-name">Misty Step <span class="spell-badge badge-dup">×2</span></div></td><td><div class="alts"><span class="alt-pill theme-utility">Spider Climb</span><span class="alt-pill theme-utility">Levitate</span><span class="alt-pill theme-utility">Earthbind</span><span class="alt-pill theme-shadow">Blur</span><span class="alt-pill theme-utility">Rope Trick</span></div><div class="note">2nd-level teleport is unique — replacements shift the mobility theme</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-wrap" data-level="3">
+    <div class="level-header">3rd Level</div>
+    <table>
+      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
+      <tbody>
+        <tr><td><div class="spell-name">Fireball</div></td><td><div class="alts"><span class="alt-pill theme-fire">Lightning Bolt</span><span class="alt-pill theme-aoe">Erupting Earth</span><span class="alt-pill theme-ice">Sleet Storm</span><span class="alt-pill theme-aoe">Stinking Cloud</span><span class="alt-pill theme-fire">Thunder Step</span></div></td></tr>
+        <tr><td><div class="spell-name">Fear</div></td><td><div class="alts"><span class="alt-pill theme-mind">Hypnotic Pattern</span><span class="alt-pill theme-mind">Slow</span><span class="alt-pill theme-mind">Enemies Abound</span><span class="alt-pill theme-mind">Bestow Curse</span></div></td></tr>
+        <tr><td><div class="spell-name">Counterspell</div></td><td><div class="alts"><span class="alt-pill theme-utility">Dispel Magic</span><span class="alt-pill theme-mind">Slow</span><span class="alt-pill theme-mind">Hypnotic Pattern</span><span class="alt-pill theme-utility">Leomund's Tiny Hut</span></div><div class="note">Losing Counterspell is a high chaos option — DM discretion advised</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-wrap" data-level="4">
+    <div class="level-header">4th Level</div>
+    <table>
+      <thead><tr><th class="col-orig">Known spell</th><th class="col-alts">Wild replacements (same level)</th></tr></thead>
+      <tbody>
+        <tr><td><div class="spell-name">Wild Radiance <span class="spell-badge badge-dup" style="background:#E1F5EE;color:#085041">HB</span></div></td><td><div class="alts"><span class="alt-pill theme-mind">Confusion</span><span class="alt-pill theme-utility">Banishment</span><span class="alt-pill theme-shadow">Polymorph</span><span class="alt-pill theme-ice">Ice Storm</span><span class="alt-pill theme-fire">Vitriolic Sphere</span><span class="alt-pill theme-utility">Fire Shield</span><span class="alt-pill theme-ice">Blight</span></div><div class="note">HB = homebrew — DM should confirm which 4th-level spells are on the approved list</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const sections = document.querySelectorAll('.section-wrap');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const level = btn.dataset.level;
+      sections.forEach(s => {
+        s.style.display = (level === 'all' || s.dataset.level === level) ? '' : 'none';
+      });
+    });
+  });
+</script>
